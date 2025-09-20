@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnifonicBot - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .dashboard-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f8f9fa;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8f2ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .files-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-details h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🏢 UnifonicBot Admin Dashboard</h1>
+            <p>Manage training files and monitor bot performance</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="navigation">
+                <a href="#" class="nav-button active" onclick="showSection('upload')">📁 Upload Files</a>
+                <a href="#" class="nav-button" onclick="showSection('files')">📋 Manage Files</a>
+                <a href="#" class="nav-button" onclick="showSection('stats')">📊 Statistics</a>
+                <a href="/" class="nav-button">💬 Customer Chat</a>
+            </div>
+
+            <!-- Upload Section -->
+            <div id="upload-section" class="section">
+                <h2>📤 Upload Training Files</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        <strong>Drag and drop files here</strong><br>
+                        or click to select files
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".txt,.pdf,.png,.jpg,.jpeg,.gif,.doc,.docx">
+                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                        Choose Files
+                    </button>
+                </div>
+                <div class="loading" id="uploadLoading">Uploading files...</div>
+            </div>
+
+            <!-- Files Management Section -->
+            <div id="files-section" class="section" style="display: none;">
+                <h2>📋 Uploaded Files</h2>
+                <div class="files-list" id="filesList">
+                    <div class="loading" id="filesLoading">Loading files...</div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div id="stats-section" class="section" style="display: none;">
+                <h2>📊 Bot Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalFiles">0</div>
+                        <div class="stat-label">Total Files</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSize">0 MB</div>
+                        <div class="stat-label">Total Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastUpload">-</div>
+                        <div class="stat-label">Last Upload</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="botStatus">🟢</div>
+                        <div class="stat-label">Bot Status</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFiles = [];
+
+        // Section navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Load data for specific sections
+            if (sectionName === 'files') {
+                loadFiles();
+            } else if (sectionName === 'stats') {
+                loadStats();
+            }
+        }
+
+        // File upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadLoading = document.getElementById('uploadLoading');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+
+            uploadLoading.style.display = 'block';
+            
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        uploadedFiles.push({
+                            name: result.filename,
+                            content: result.content,
+                            size: file.size,
+                            type: file.type,
+                            uploadTime: new Date().toISOString()
+                        });
+                        showMessage(`✅ File uploaded: ${result.filename}`, 'success');
+                    } else {
+                        showMessage(`❌ Upload failed: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    showMessage(`❌ Upload error: ${error.message}`, 'error');
+                }
+            }
+            
+            uploadLoading.style.display = 'none';
+            fileInput.value = '';
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message`;
+            messageDiv.textContent = message;
+            
+            const uploadSection = document.getElementById('upload-section');
+            uploadSection.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Load files
+        async function loadFiles() {
+            const filesLoading = document.getElementById('filesLoading');
+            const filesList = document.getElementById('filesList');
+            
+            filesLoading.style.display = 'block';
+            filesList.innerHTML = '';
+            
+            // Simulate loading files (in real app, fetch from server)
+            setTimeout(() => {
+                filesLoading.style.display = 'none';
+                
+                if (uploadedFiles.length === 0) {
+                    filesList.innerHTML = '<p style="text-align: center; color: #666;">No files uploaded yet</p>';
+                    return;
+                }
+                
+                uploadedFiles.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div class="file-info">
+                            <div class="file-icon">📄</div>
+                            <div class="file-details">
+                                <h4>${file.name}</h4>
+                                <p>Size: ${(file.size / 1024 / 1024).toFixed(2)} MB | Uploaded: ${new Date(file.uploadTime).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-primary" onclick="viewFile(${index})">View</button>
+                            <button class="btn btn-danger" onclick="deleteFile(${index})">Delete</button>
+                        </div>
+                    `;
+                    filesList.appendChild(fileItem);
+                });
+            }, 1000);
+        }
+
+        // Load statistics
+        function loadStats() {
+            document.getElementById('totalFiles').textContent = uploadedFiles.length;
+            
+            const totalSize = uploadedFiles.reduce((sum, file) => sum + file.size, 0);
+            document.getElementById('totalSize').textContent = (totalSize / 1024 / 1024).toFixed(2) + ' MB';
+            
+            if (uploadedFiles.length > 0) {
+                const lastUpload = new Date(Math.max(...uploadedFiles.map(f => new Date(f.uploadTime))));
+                document.getElementById('lastUpload').textContent = lastUpload.toLocaleDateString();
+            }
+            
+            document.getElementById('botStatus').textContent = '🟢 Online';
+        }
+
+        // File actions
+        function viewFile(index) {
+            const file = uploadedFiles[index];
+            alert(`File: ${file.name}\n\nContent Preview:\n${file.content.substring(0, 500)}...`);
+        }
+
+        function deleteFile(index) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                uploadedFiles.splice(index, 1);
+                loadFiles();
+                showMessage('File deleted successfully', 'success');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+        });
+    </script>
+</body>
+</html>

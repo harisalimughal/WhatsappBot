@@ -1,0 +1,6 @@
+openai
+python-dotenv
+flask
+requests
+PyPDF2
+azure-storage-blob
