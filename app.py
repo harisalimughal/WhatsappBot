@@ -271,4 +271,11 @@ if __name__ == '__main__':
     # Run in production mode when deployed
     debug_mode = os.environ.get('FLASK_ENV') != 'production'
     
-    app.run(debug=debug_mode, host='0.0.0.0', port=port)
+    # Use gunicorn in production, Flask dev server in development
+    if os.environ.get('FLASK_ENV') == 'production':
+        print("Running in production mode with gunicorn")
+        # This will be handled by gunicorn command in Dockerfile
+        app.run(debug=False, host='0.0.0.0', port=port)
+    else:
+        print("Running in development mode")
+        app.run(debug=debug_mode, host='0.0.0.0', port=port)
